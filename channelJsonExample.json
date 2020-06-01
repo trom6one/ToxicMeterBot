@@ -1,0 +1,30 @@
+{
+    "_total": 1,
+    "channels": [
+        {
+            "mature": false,
+            "status": "тест расширения",
+            "broadcaster_language": "ru",
+            "broadcaster_software": "unknown_rtmp",
+            "display_name": "trom666one",
+            "game": "Games + Demos",
+            "language": "ru",
+            "_id": 174360102,
+            "name": "trom666one",
+            "created_at": "2017-09-16T07:18:57.244447Z",
+            "updated_at": "2020-05-31T10:18:11.195594Z",
+            "partner": false,
+            "logo": "https://static-cdn.jtvnw.net/jtv_user_pictures/7a47eb64-1d24-4f31-b9d0-146fc096edbd-profile_image-300x300.png",
+            "video_banner": null,
+            "profile_banner": "https://static-cdn.jtvnw.net/jtv_user_pictures/3f774d81-c0f8-40ac-9ef1-0d2affe67eff-profile_banner-480.jpg",
+            "profile_banner_background_color": "",
+            "url": "https://www.twitch.tv/trom666one",
+            "views": 600,
+            "followers": 8,
+            "broadcaster_type": "",
+            "description": "セーブロード",
+            "private_video": false,
+            "privacy_options_enabled": false
+        }
+    ]
+}
