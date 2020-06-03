@@ -3,18 +3,8 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 const tmi = require('tmi.js');
-
-const http = require('http');
-
-
-
+//const http = require('http');
 var request = require('request');
-
-
-
-
-
-
 
 process.env.BOT_USERNAME = 'ToxicMeterBot';
 process.env.OAUTH_TOKEN = 'oauth:g2lyyqo0pkzd3swu3pfzvhj3xsq8jh';
