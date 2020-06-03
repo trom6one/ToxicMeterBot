@@ -36,10 +36,9 @@ var opts = {
 };
 
 var json_channels = {
-  "0":
-    {
-      "name": "00-00-00"
-    }
+  "0": {
+    "name": "00-00-00"
+  }
 };
 
 app.listen(port, () => {
@@ -72,32 +71,33 @@ app.listen(port, () => {
 
 
 // страница для инициализации бота 
-app.get('/activate?:channel', function(req, res) {
+app.get('/activate?:channel', function (req, res) {
   var channel = req.query.channel;
-  
-  console.log(`channel = ${req.query.channel}`); //////////
-  console.log(`json_channels >= ${json_channels}`); /////////
-  console.log(`json_channels['666'].name >= ${json_channels['666'].name}`); /////////
 
-  // TODO Проверять статус подключения ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Если подключился, добавлять в список
-    // Если не подключился, пробовать снова до N раз
+  console.log(`channel = ${req.query.channel}`);
+  console.log(`json_channels >= ${json_channels}`);
+  console.log(`json_channels['666'].name >= ${json_channels['666'].name}`);
+
+  // TODO Проверять статус подключения
+  // Если подключился, добавлять в список
+  // Если не подключился, пробовать снова до N раз
   // По окончанию отправлять ответ клиент в виде статуса подключения
   if (channel in json_channels) {
-    if (json_channels[channel]['active'] == 1){ // TODO Проверка через tmi.client и внутри запроса
-      console.log('Bot already active'); //////////
+    if (json_channels[channel]['active'] == 1) { // TODO Проверка через tmi.client и внутри запроса
+      console.log('Bot already active');
       res.sendStatus(500);
     }
-  }
-  else{
-    request(`https://api.twitch.tv/kraken/channels?client_id=${client_id}&api_version=5&id=${channel}`, function (error, res, body) { 
+  } else {
+    request(`https://api.twitch.tv/kraken/channels?client_id=${client_id}&api_version=5&id=${channel}`, function (error, res, body) {
 
       var name = JSON.parse(body).channels[0].name;
 
-      json_channels[channel] = {"name": name};
-  
-      console.log(`json_channels => ${JSON.stringify(json_channels)}`); /////////
-  
+      json_channels[channel] = {
+        "name": name
+      };
+
+      console.log(`json_channels => ${JSON.stringify(json_channels)}`);
+
       opts['channels'] = [json_channels[channel]['name']];
 
       client.options = opts;
@@ -133,44 +133,46 @@ app.get('/activate?:channel', function(req, res) {
 
 
 // страница для инициализации бота 
-app.get('/deactivate?:channel', function(req, res) {
+app.get('/deactivate?:channel', function (req, res) {
   var channel = req.query.channel;
-  
-  console.log(`channel = ${req.query.channel}`); //////////
-  console.log(`json_channels >= ${json_channels}`); /////////
-  console.log(`json_channels['666'].name >= ${json_channels['666'].name}`); /////////
+
+  console.log(`channel = ${req.query.channel}`);
+  console.log(`json_channels >= ${json_channels}`);
+  console.log(`json_channels['666'].name >= ${json_channels['666'].name}`);
 
 
   // TODO Проверять находится ли канал в списке
-    // Если в списке, проверить наличие активного подключения
-      // Если подключен, отключить
-    // Если нет в списке, отправить ответ
+  // Если в списке, проверить наличие активного подключения
+  // Если подключен, отключить
+  // Если нет в списке, отправить ответ
   // По окончанию, отправить ответ
   if (channel in json_channels) {
-    if (json_channels[channel]['active'] == 1){
-      console.log('Bot already active'); //////////
+    if (json_channels[channel]['active'] == 1) {
+      console.log('Bot already active');
       res.sendStatus(500);
     }
-  }
-  else{
-    request(`https://api.twitch.tv/kraken/channels?client_id=${client_id}&api_version=5&id=${channel}`, function (error, res, body) { 
+  } else {
+    request(`https://api.twitch.tv/kraken/channels?client_id=${client_id}&api_version=5&id=${channel}`, function (error, res, body) {
       // if (!error && res.statusCode == 200) {   
       //   var parsed_body = JSON.parse(body);      
       //   name = parsed_body.channels[0].name;
       // }
       // else{
-      //   console.log(`request error = ${error}`); ///////////
-      //   console.log(`request res.statusCode = ${res.statusCode}`); //////////
+      //   console.log(`request error = ${error}`);
+      //   console.log(`request res.statusCode = ${res.statusCode}`);
       // }
-       
+
       // var parsed_body = JSON.parse(body);  
 
       var name = JSON.parse(body).channels[0].name;
 
-      json_channels[channel] = {"name": name, "active": 1};
-  
-      console.log(`json_channels => ${JSON.stringify(json_channels)}`); /////////
-  
+      json_channels[channel] = {
+        "name": name,
+        "active": 1
+      };
+
+      console.log(`json_channels => ${JSON.stringify(json_channels)}`);
+
       // TODO Проверить коннект бота к каналам с заменой opts.channels
       opts['channels'] = [json_channels[channel]['name']];
       // client.options.channels = [name];
@@ -220,15 +222,17 @@ app.get('/deactivate?:channel', function(req, res) {
 
 
 // страница для отключения бота
-app.get('/deactivate', function(req, res) {
+app.get('/deactivate', function (req, res) {
   res.sendStatus(200);
 })
 
 // страница для настройки бота
-app.get('/config/:channel', function(req, res) {
+app.get('/config/:channel', function (req, res) {
   var channel = req.params.channel;
   // var token = req.params.token;
-  res.sendFile(__dirname + '/config.html', {channel: channel}); // , token: token
+  res.sendFile(__dirname + '/config.html', {
+    channel: channel
+  }); // , token: token
 })
 
 
@@ -243,7 +247,7 @@ const client = new tmi.client(opts);
 client.on('connected', onConnectedHandler);
 
 // Called every time the bot connects to Twitch chat
-function onConnectedHandler (addr, port) {
+function onConnectedHandler(addr, port) {
   console.log(`* Connected to ${addr}:${port}`);
 }
 
@@ -251,8 +255,10 @@ function onConnectedHandler (addr, port) {
 client.on('message', onMessageHandler);
 
 // Called every time a message comes in
-function onMessageHandler (target, context, msg, self) {
-  if (self) { return; } // Ignore messages from the bot
+function onMessageHandler(target, context, msg, self) {
+  if (self) {
+    return;
+  } // Ignore messages from the bot
 
   console.log(`target = ${target}`);
 
@@ -273,7 +279,7 @@ function onMessageHandler (target, context, msg, self) {
 //client.connect();
 
 // Function called when the "dice" command is issued
-function rollDice () {
+function rollDice() {
   const sides = 20;
   return Math.floor(Math.random() * sides) + 1;
 }
