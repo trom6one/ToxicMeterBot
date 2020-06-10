@@ -128,7 +128,7 @@ function delay(ms){
   });
 };
 
-function checkOnline(name){
+function checkOnline(channelId, name){
   var stream = null;
   client.api({
     url: `https://api.twitch.tv/kraken/streams/${channelId}`,
