@@ -219,7 +219,7 @@ app.get('/config/:channel', function (req, res) {
 
 
 // Create a client with our options
-const client = new tmi.client(opts);
+// const client = new tmi.client(opts);
 
 // -- Register our event handlers (defined below)
 // client.on('connected', onConnectedHandler);
