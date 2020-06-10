@@ -68,8 +68,14 @@ const client = new tmi.client(opts);
 
 // страница для инициализации бота 
 app.get('/toxic', function (req, res) { // ?channel&name
-  var channelId = req.query.channel;
-  var name = req.query.name;
+  // var channelId = req.query.channel;
+  // var name = req.query.name;
+  var channelId = req.headers.channelId;
+  var name = req.headers.channelName;
+
+  console.log(`POST id = ${channelId}`);
+  console.log(`POST name = ${name}`);
+  
   
   json_channels[channelId]['name'] = name;
 
