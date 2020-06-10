@@ -65,8 +65,12 @@ const client = new tmi.client(opts);
   // TODO Если стрим не активен, отключаемся от канала
   // TODO Если стрим активен, запускаем таймер еще на 10 минут
 
+app.get('/', function(req, res){
+  res.send('id: ' + req.query.id);
+});
+
 // страница для инициализации бота 
-app.get('/toxic?:channel&:name', function (req, res) {
+app.get('/toxic?channel&name', function (req, res) {
   var channelId = req.query.channel;
   var name = req.query.name;
   
