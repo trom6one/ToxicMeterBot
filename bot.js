@@ -79,7 +79,7 @@ app.post('/toxic', function (req, res) { // ?channel&name
   console.log(`POST name = ${name}`);
   
   
-  json_channels[channelId]['name'] = name;
+  // json_channels[channelId]['name'] = name;
 
   // TODO Проверять статус подключения
   // Если подключился, добавлять в список
