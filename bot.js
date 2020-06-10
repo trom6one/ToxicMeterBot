@@ -141,6 +141,7 @@ function checkOnline(channelId, name){
   }, (err, res, body) => {
       console.log(body);
       stream = JSON.parse(body).stream;
+      console.log(stream);
   });
 
   if(stream == null){
