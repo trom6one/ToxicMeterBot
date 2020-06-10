@@ -6,11 +6,13 @@ const tmi = require('tmi.js');
 //const http = require('http');
 var request = require('request');
 
+const client_id = 'cu6xkebsgerd6ikki3cq08ov1koygc';
+const oauth_key = 'g2lyyqo0pkzd3swu3pfzvhj3xsq8jh';
+
 process.env.BOT_USERNAME = 'ToxicMeterBot';
 process.env.OAUTH_TOKEN = 'oauth:g2lyyqo0pkzd3swu3pfzvhj3xsq8jh';
 process.env.CHANNEL_NAME = 'trom666one';
 
-const client_id = 'cu6xkebsgerd6ikki3cq08ov1koygc';
 
 //let channels = {174360102:'trom666one'}
 
@@ -21,13 +23,14 @@ var opts = {
     password: process.env.OAUTH_TOKEN
   },
   channels: [
-    // process.env.CHANNEL_NAME // TODO -------------------------------
+    // process.env.CHANNEL_NAME
   ]
 };
 
 var json_channels = {
   "0": {
-    "name": "00-00-00"
+    "name": "0",
+    "active": "0"
   }
 };
 
@@ -54,167 +57,148 @@ app.listen(port, () => {
 
 
 
+const client = new tmi.client(opts);
 
-
-
-
-
+// TODO Получаем сообщение от EBS
+// TODO Подключаемся к каналу и отправляем сообщение в чат
+// TODO Запукаем таймер на 10 минут
+  // TODO Если стрим не активен, отключаемся от канала
+  // TODO Если стрим активен, запускаем таймер еще на 10 минут
 
 // страница для инициализации бота 
-app.get('/activate?:channel', function (req, res) {
-  var channel = req.query.channel;
-
-  console.log(`channel = ${req.query.channel}`);
-  console.log(`json_channels >= ${json_channels}`);
-  console.log(`json_channels['666'].name >= ${json_channels['666'].name}`);
+app.get('/toxic?:channel:name', function (req, res) {
+  var channelId = req.query.channel;
+  var name = req.query.name;
+  
+  json_channels[channelId]['name'] = name;
 
   // TODO Проверять статус подключения
   // Если подключился, добавлять в список
   // Если не подключился, пробовать снова до N раз
   // По окончанию отправлять ответ клиент в виде статуса подключения
-  if (channel in json_channels) {
-    if (json_channels[channel]['active'] == 1) { // TODO Проверка через tmi.client и внутри запроса
-      console.log('Bot already active');
-      res.sendStatus(500);
-    }
-  } else {
-    request(`https://api.twitch.tv/kraken/channels?client_id=${client_id}&api_version=5&id=${channel}`, function (error, res, body) {
 
-      var name = JSON.parse(body).channels[0].name;
+  // Returns one of the following states: "CONNECTING", "OPEN", "CLOSING" or "CLOSED".
+  //console.log(client.readyState());
 
-      json_channels[channel] = {
-        "name": name
-      };
+  opts['channels'] = [name]; // [json_channels[channelId]['name']];
+  client.options = opts;
 
-      console.log(`json_channels => ${JSON.stringify(json_channels)}`);
-
-      opts['channels'] = [json_channels[channel]['name']];
-
-      client.options = opts;
-
-      client.connect();
-    })
+  // "CONNECTING", "OPEN", "CLOSING", "CLOSED"
+  if(client.readyState() == "CLOSING"){
+    await delay(10000);
+    client.connect();
   }
 
-  res.sendStatus(200);
-})
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// страница для инициализации бота 
-app.get('/deactivate?:channel', function (req, res) {
-  var channel = req.query.channel;
-
-  console.log(`channel = ${req.query.channel}`);
-  console.log(`json_channels >= ${json_channels}`);
-  console.log(`json_channels['666'].name >= ${json_channels['666'].name}`);
-
-
-  // TODO Проверять находится ли канал в списке
-  // Если в списке, проверить наличие активного подключения
-  // Если подключен, отключить
-  // Если нет в списке, отправить ответ
-  // По окончанию, отправить ответ
-  if (channel in json_channels) {
-    if (json_channels[channel]['active'] == 1) {
-      console.log('Bot already active');
-      res.sendStatus(500);
-    }
-  } else {
-    request(`https://api.twitch.tv/kraken/channels?client_id=${client_id}&api_version=5&id=${channel}`, function (error, res, body) {
-      // if (!error && res.statusCode == 200) {   
-      //   var parsed_body = JSON.parse(body);      
-      //   name = parsed_body.channels[0].name;
-      // }
-      // else{
-      //   console.log(`request error = ${error}`);
-      //   console.log(`request res.statusCode = ${res.statusCode}`);
-      // }
-
-      // var parsed_body = JSON.parse(body);  
-
-      var name = JSON.parse(body).channels[0].name;
-
-      json_channels[channel] = {
-        "name": name,
-        "active": 1
-      };
-
-      console.log(`json_channels => ${JSON.stringify(json_channels)}`);
-
-      // TODO Проверить коннект бота к каналам с заменой opts.channels
-      opts['channels'] = [json_channels[channel]['name']];
-      // client.options.channels = [name];
-      client.options = opts;
-      // TODO Проверить коннект бота к каналам с добавлением каналов 
-      // будет ли повторно подключаться или скипнет ?
-      // opts.channels.push(json[channel].name);
-      //
-      client.disconnect();
-    })
+  if(client.readyState() == "CLOSED"){
+    client.connect();
+    await delay(10000);
   }
 
-  res.sendStatus(200);
-})
+  if(client.readyState() == "OPEN"){
+    client.join(name)
+    .then((data) => {
+
+      console.log(`Join to ${name}, data = ${data}`);
+      checkOnline(channelId, name);
+
+    }).catch((err) => {
+
+      console.log(`Join to ${name}, error = ${err}`);
+      
+    });
+  }
+});
+
+function delay(ms){
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+};
+
+function checkOnline(name){
+  var stream = null;
+  client.api({
+    url: `https://api.twitch.tv/kraken/streams/${channelId}`,
+    method: "GET",
+    headers: {
+        "Accept": "application/vnd.twitchtv.v5+json",
+        "Authorization": `OAuth ${oauth_key}`,
+        "Client-ID": client_id
+    }
+  }, (err, res, body) => {
+      console.log(body);
+      stream = JSON.parse(body).stream;
+  });
+
+  if(stream == null){
+    client.part(name)
+    .then((data) => {
+      console.log(`Part from ${name}, data = ${data}`);
+    }).catch((err) => {
+      console.log(`Part from ${name}, error = ${err}`);
+    });
+  } else {
+    await delay(10000);
+    checkOnline(name);
+  }
+}
 
 
 
 
 
 
+client.on("connecting", (address, port) => {
+  // Do your stuff.
+  console.log(`Bot is connecting`);
+  console.log(address);
+  console.log(port);
+});
+
+client.on("connected", (address, port) => {
+  // Do your stuff.
+  console.log(`Bot connected`);
+  console.log(address);
+  console.log(port);
+});
+
+client.on("disconnected", (reason) => {
+  // Do your stuff.
+  console.log(`Bot disconnected`);
+  console.log(reason);
+});
+
+client.on("emoteonly", (channel, enabled) => {
+  // Do your stuff.
+  console.log(`Emote only`);
+  console.log(channel);
+  console.log(enabled);
+});
+
+client.on("followersonly", (channel, enabled, length) => {
+  // Do your stuff.
+  console.log(`Followers only`);
+  console.log(channel);
+  console.log(enabled);
+  console.log(length);
+});
+
+client.on("hosting", (channel, target, viewers) => {
+  // Do your stuff.
+  console.log(`Hosting`);
+  console.log(channel);
+  console.log(target);
+  console.log(viewers);
+});
+
+client.on("logon", () => {
+  // Do your stuff.
+  console.log(`Logon`);
+});
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// страница для отключения бота
-app.get('/deactivate', function (req, res) {
-  res.sendStatus(200);
-})
 
 // страница для настройки бота
 app.get('/config/:channel', function (req, res) {
@@ -234,12 +218,12 @@ app.get('/config/:channel', function (req, res) {
 const client = new tmi.client(opts);
 
 // -- Register our event handlers (defined below)
-client.on('connected', onConnectedHandler);
+// client.on('connected', onConnectedHandler);
 
 // Called every time the bot connects to Twitch chat
-function onConnectedHandler(addr, port) {
-  console.log(`* Connected to ${addr}:${port}`);
-}
+// function onConnectedHandler(addr, port) {
+//   console.log(`* Connected to ${addr}:${port}`);
+// }
 
 // --
 client.on('message', onMessageHandler);
