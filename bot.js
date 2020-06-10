@@ -140,11 +140,10 @@ function checkOnline(channelId, name){
     }
   }, (err, res, body) => {
       console.log(body);
-      stream = JSON.parse(body)["stream"];
-      console.log(stream);
+      stream = body;
   });
 
-  if(stream == null){
+  if(stream == "{ stream: null }"){
     client.part(name)
     .then((data) => {
       console.log(`Part from ${name}, data = ${data}`);
