@@ -85,13 +85,13 @@ app.get('/toxic?:channel:name', function (req, res) {
 
   // "CONNECTING", "OPEN", "CLOSING", "CLOSED"
   if(client.readyState() == "CLOSING"){
-    await delay(10000);
+    initDelay(10000);
     client.connect();
   }
 
   if(client.readyState() == "CLOSED"){
     client.connect();
-    await delay(10000);
+    initDelay(10000);
   }
 
   if(client.readyState() == "OPEN"){
@@ -104,10 +104,14 @@ app.get('/toxic?:channel:name', function (req, res) {
     }).catch((err) => {
 
       console.log(`Join to ${name}, error = ${err}`);
-      
+
     });
   }
 });
+
+async function initDelay(ms){
+  await delay(ms);
+}
 
 function delay(ms){
   return new Promise((resolve) => {
@@ -138,7 +142,7 @@ function checkOnline(name){
       console.log(`Part from ${name}, error = ${err}`);
     });
   } else {
-    await delay(10000);
+    initDelay(10000);
     checkOnline(name);
   }
 }
