@@ -70,8 +70,10 @@ const client = new tmi.client(opts);
 app.post('/toxic', function (req, res) { // ?channel&name
   // var channelId = req.query.channel;
   // var name = req.query.name;
-  var channelId = req.headers.channelId;
-  var name = req.headers.channelName;
+  // var channelId = req.headers.channelId;
+  // var name = req.headers.channelName;
+  var channelId = req.header('channelId');
+  var name = req.header('channelName');
 
   console.log(`POST id = ${channelId}`);
   console.log(`POST name = ${name}`);
